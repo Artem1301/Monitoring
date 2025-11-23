@@ -1,0 +1,21 @@
+{
+  "id": null,
+  "title": "Sensor Monitoring",
+  "schemaVersion": 36,
+  "version": 1,
+  "refresh": "5s",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "Sensor Value",
+      "targets": [
+        {
+          "expr": "sensor_value",
+          "legendFormat": "Sensor Value",
+          "interval": ""
+        }
+      ],
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 8 }
+    }
+  ]
+}
