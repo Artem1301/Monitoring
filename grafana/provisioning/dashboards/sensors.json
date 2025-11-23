@@ -3,7 +3,7 @@
   "title": "Sensor Monitoring",
   "schemaVersion": 36,
   "version": 1,
-  "refresh": "5s",
+  "refresh": "1s",
   "panels": [
     {
       "type": "graph",
@@ -16,6 +16,18 @@
         }
       ],
       "gridPos": { "x": 0, "y": 0, "w": 24, "h": 8 }
+    },
+    {
+      "type": "graph",
+      "title": "Humidity",
+      "targets": [
+        {
+          "expr": "humidity",
+          "legendFormat": "Humidity",
+          "interval": ""
+        }
+      ],
+      "gridPos": { "x": 0, "y": 8, "w": 24, "h": 8 }
     }
   ]
 }
