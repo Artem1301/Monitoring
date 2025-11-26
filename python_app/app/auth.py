@@ -5,6 +5,7 @@ from jwt_utils import create_access_token, jwt_required
 from metrics import start_metrics_server_once
 from queue_utils import send_to_queue
 from datetime import datetime, timezone
+import json
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -43,7 +44,12 @@ def login():
 
     token = create_access_token(username)
 
-    send_to_queue(f"user_logged_in:{username}")
+    send_to_queue(json.dumps({
+        "type": "login_event",
+        "username": username,
+        "timestamp": datetime.now(timezone.utc).timestamp()
+    }))
+
     start_metrics_server_once()
 
     return jsonify({

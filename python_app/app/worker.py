@@ -1,6 +1,54 @@
 import pika
+import json
+import psycopg2
+from datetime import datetime
 import threading
-from metrics import sensor_value, humidity
+
+
+DB_HOST = "postgres"
+DB_NAME = "sensors_db"
+DB_USER = "postgres"
+DB_PASSWORD = "postgres"
+
+
+def save_login_event(event):
+    conn = psycopg2.connect(
+        host=DB_HOST, dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD
+    )
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO login_events (username, event_time)
+        VALUES (%s, to_timestamp(%s))
+    """, (
+        event["username"],
+        event["timestamp"]
+    ))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+def save_sensor_metric(event):
+    conn = psycopg2.connect(
+        host=DB_HOST, dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD
+    )
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO sensor_metrics (sensor_value, humidity, event_time)
+        VALUES (%s, %s, to_timestamp(%s))
+    """, (
+        event["sensor_value"],
+        event["humidity"],
+        event["timestamp"]
+    ))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
 
 def start_worker():
     def run():
@@ -8,21 +56,34 @@ def start_worker():
         ch = conn.channel()
         ch.queue_declare(queue="metrics_queue", durable=True)
 
+        print("Worker listening for RabbitMQ messages...")
+
         def callback(ch, method, props, body):
-            msg = body.decode()
-            # Парсимо повідомлення у форматі metric:value
-            if ":" in msg:
-                name, val = msg.split(":")
-                val = float(val)
-                if name == "sensor_value":
-                    sensor_value.set(val)
-                elif name == "humidity":
-                    humidity.set(val)
-            ch.basic_ack(delivery_tag=method.delivery_tag)
-            print(f"Processed message: {msg}")
+            print(f"Worker received: {body}")
+
+            try:
+                data = json.loads(body.decode())
+            except Exception as e:
+                print("Invalid JSON:", e)
+                ch.basic_ack(method.delivery_tag)
+                return
+
+            msg_type = data.get("type")
+
+            if msg_type == "login_event":
+                save_login_event(data)
+                print("Saved login event.")
+
+            elif msg_type == "metric":
+                save_sensor_metric(data)
+                print("Saved metric.")
+
+            else:
+                print("Unknown message type:", msg_type)
+
+            ch.basic_ack(method.delivery_tag)
 
         ch.basic_consume(queue="metrics_queue", on_message_callback=callback)
-        print("Worker started...")
         ch.start_consuming()
 
     threading.Thread(target=run, daemon=True).start()

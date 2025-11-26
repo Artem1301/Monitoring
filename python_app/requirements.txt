@@ -1,5 +1,6 @@
-prometheus_client
-Flask
-Werkzeug
-PyJWT
+flask
 pika
+prometheus_client
+werkzeug
+pyjwt
+psycopg2-binary

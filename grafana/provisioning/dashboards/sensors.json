@@ -1,18 +1,18 @@
 {
   "id": null,
-  "title": "Sensor Monitoring",
+  "title": "Sensor Monitoring PRO",
   "schemaVersion": 36,
-  "version": 1,
+  "version": 2,
   "refresh": "1s",
   "panels": [
     {
       "type": "graph",
       "title": "Sensor Value",
+      "description": "Графік значення основного сенсора",
       "targets": [
         {
           "expr": "sensor_value",
-          "legendFormat": "Sensor Value",
-          "interval": ""
+          "legendFormat": "Sensor Value"
         }
       ],
       "gridPos": { "x": 0, "y": 0, "w": 24, "h": 8 }
@@ -20,14 +20,104 @@
     {
       "type": "graph",
       "title": "Humidity",
+      "description": "Графік вологості",
       "targets": [
         {
           "expr": "humidity",
-          "legendFormat": "Humidity",
-          "interval": ""
+          "legendFormat": "Humidity"
         }
       ],
       "gridPos": { "x": 0, "y": 8, "w": 24, "h": 8 }
+    },
+    {
+      "type": "graph",
+      "title": "Temperature & Humidity Comparison",
+      "description": "Порівняння значень sensor_value та humidity",
+      "targets": [
+        { "expr": "sensor_value", "legendFormat": "Sensor" },
+        { "expr": "humidity", "legendFormat": "Humidity" }
+      ],
+      "gridPos": { "x": 0, "y": 16, "w": 24, "h": 8 }
+    },
+    {
+      "type": "stat",
+      "title": "Sensor Value — Average (5m)",
+      "description": "Середнє значення за 5 хвилин",
+      "targets": [
+        {
+          "expr": "avg_over_time(sensor_value[5m])",
+          "legendFormat": "Average 5m"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 24, "w": 8, "h": 6 }
+    },
+    {
+      "type": "stat",
+      "title": "Humidity — Average (5m)",
+      "targets": [
+        {
+          "expr": "avg_over_time(humidity[5m])",
+          "legendFormat": "Average 5m"
+        }
+      ],
+      "gridPos": { "x": 8, "y": 24, "w": 8, "h": 6 }
+    },
+    {
+      "type": "stat",
+      "title": "Sensor Status",
+      "description": "Показує '1', якщо сенсор прислав дані за останні 10 секунд, інакше '0'",
+      "targets": [
+        {
+          "expr": "sensor_value offset 0s",
+          "legendFormat": "Value"
+        }
+      ],
+      "gridPos": { "x": 16, "y": 24, "w": 8, "h": 6 },
+      "thresholds": "0,1"
+    },
+    {
+      "type": "gauge",
+      "title": "Gauge — Sensor Value",
+      "targets": [
+        { "expr": "sensor_value", "legendFormat": "Current" }
+      ],
+      "gridPos": { "x": 0, "y": 30, "w": 12, "h": 8 }
+    },
+    {
+      "type": "gauge",
+      "title": "Gauge — Humidity",
+      "targets": [
+        { "expr": "humidity", "legendFormat": "Current" }
+      ],
+      "gridPos": { "x": 12, "y": 30, "w": 12, "h": 8 }
+    },
+    {
+      "type": "table",
+      "title": "Last Sensor Values",
+      "description": "Показує останні отримані значення сенсорів",
+      "targets": [
+        {
+          "expr": "sensor_value",
+          "legendFormat": "Sensor Value"
+        },
+        {
+          "expr": "humidity",
+          "legendFormat": "Humidity"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 38, "w": 24, "h": 10 }
+    },
+    {
+      "type": "heatmap",
+      "title": "Sensor Heatmap",
+      "description": "Історія зміни сенсорних показників",
+      "targets": [
+        {
+          "expr": "sensor_value",
+          "legendFormat": "Heat"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 48, "w": 24, "h": 10 }
     }
   ]
 }

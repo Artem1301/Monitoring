@@ -1,25 +1,35 @@
-import random
 import time
+import random
 import threading
-from prometheus_client import Gauge, start_http_server
-from mq import send_to_queue
+import json
+from prometheus_client import start_http_server, Gauge
+from queue_utils import send_to_queue
 
 METRICS_PORT = 8000
 metrics_started = False
 
-sensor_value = Gauge("sensor_value", "Random sensor value from Python app")
-humidity = Gauge("humidity", "Random humidity value")
+sensor_value_g = Gauge("sensor_value", "Random sensor value from Python app")
+humidity_g = Gauge("humidity", "Random humidity value")
 
 def generate_metrics():
     while True:
-        val = random.randint(0, 100)
-        hum = random.randint(15, 75)
+        sensor_val = random.randint(0, 100)
+        humidity_val = random.randint(15, 75)
 
-        # Відправляємо в чергу
-        send_to_queue(f"sensor_value:{val}")
-        send_to_queue(f"humidity:{hum}")
+        # Прометеус метрики:
+        sensor_value_g.set(sensor_val)
+        humidity_g.set(humidity_val)
+
+        # Надсилання RabbitMQ:
+        send_to_queue(json.dumps({
+            "type": "metric",
+            "sensor_value": sensor_val,
+            "humidity": humidity_val,
+            "timestamp": time.time()
+        }))
 
         time.sleep(5)
+
 
 def start_metrics_server_once():
     global metrics_started
