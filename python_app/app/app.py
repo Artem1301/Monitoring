@@ -11,5 +11,5 @@ app.register_blueprint(auth_bp)
 if __name__ == "__main__":
     init_db()
     start_worker()              # запускаємо worker
-    start_metrics_server_once() # запускаємо генератор метрик та Prometheus server
+#    start_metrics_server_once() # запускаємо генератор метрик та Prometheus server
     app.run(host="0.0.0.0", port=5000, debug=False)
