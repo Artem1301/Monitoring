@@ -1,7 +1,7 @@
 # Sensor Monitoring System  
 Повноцінна система моніторингу сенсорів у реальному часі з використанням:
 
-- **Python FastAPI** — API та UI авторизації  
+- **Python FastAPI** — API авторизації  
 - **Worker (Python)** — отримання даних з RabbitMQ  
 - **RabbitMQ** — черга повідомлень  
 - **PostgreSQL** — база для збереження показників  
